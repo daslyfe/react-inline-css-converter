@@ -1,5 +1,5 @@
 import "./App.css";
-import { createRef } from "react";
+import { createRef, useState } from "react";
 
 const testStyle = {
   margin: 0,
@@ -8,61 +8,67 @@ const testStyle = {
   fontSize: "1vw",
   top: ".2vw",
   fontWeight: "bold",
-  left: "2%",
+  left: "0",
   color: "blue",
   position: "absolute",
   width: "92%",
 };
 
-const text = {
-  value: "",
-  toCss() {
-    const findIllegal = /[="]/gi;
+function StoreString() {
+  this.value = "";
+  this.toCss = () => {
+    const findIllegal = /[=\\"']/gi;
     const findComma = /[,]/gi;
     const findUppercase = /[A-Z]/g;
-  
+
     let filteredString = this.value
       .replace(findIllegal, "")
-      .replace(findComma, "; ")
+      .replace(findComma, ";")
       .replace(findUppercase, (char) => `-${char.toLowerCase()}`);
 
-    const openBracketIndex = filteredString.indexOf("{") || false;
-    const className =
-      openBracketIndex && openBracketIndex != 0
-        ? `.${filteredString.split(" ")[1]}`
-        : false;
-    filteredString = `${className ? className : ""} ${filteredString.slice(openBracketIndex)}`;
-    return filteredString;
+    const openBracketIndex =
+      filteredString.indexOf("{") > 0 ? filteredString.indexOf("{") : false;
+
+    const className = openBracketIndex
+      ? `.${filteredString.split(" ")[1]}`
+      : false;
+    filteredString = `${className ? className : ""} ${filteredString.slice(
+      openBracketIndex
+    )}`;
     console.log("filteredString " + filteredString);
     console.log("classname " + className);
+    return filteredString;
     // return textArray.map((text) => {});
-  },
-  updateValue(input) {
+  };
+  this.updateValue = (input) => {
     this.value = JSON.stringify(input);
-  },
-};
+  };
+}
+
+
+const inputString = new StoreString();
 function App() {
-  const leftInput = createRef();
-  const rightInput = createRef();
+  const [userInput, setUserInput] = useState("");
+  const [mode, setMode] = useState("inlineToCss");
 
-  text.updateValue(testStyle);
-  text.toCss();
+  const inputBoxRef = createRef();
+ 
 
-  const handleLeftInput = ({ target }) => {
+  inputString.updateValue(userInput);
+  inputString.toCss();
+
+  const handleUserInput = ({ target }) => {
     const { value } = target;
-    console.log(value);
+    setUserInput(value);
   };
 
-  const handleRightInput = ({ target }) => {
-    const { value } = target;
-    console.log(value);
-  };
+
 
   return (
     <div className="App">
-      <input type="text" ref={leftInput} onChange={handleLeftInput} />
-      <input type="text" ref={rightInput} onChange={handleRightInput} />
-      <code>{text.toCss()}</code>
+      <input type="text" ref={inputBoxRef} onChange={handleUserInput} />
+  
+      <code>{inputString.toCss()}</code>
     </div>
   );
 }
