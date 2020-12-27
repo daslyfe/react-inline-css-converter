@@ -1,8 +1,10 @@
 import "./App.css";
 import { createRef, useState } from "react";
+import { ar, num } from "./utility/utility";
+import ManipulateString from "./utility/store-string";
 
-const testStyle = {
-  margin: 0,
+const defaultInput = `const style = {
+  margin: 0, 
   padding: 0,
   background: "none",
   fontSize: "1vw",
@@ -12,63 +14,43 @@ const testStyle = {
   color: "blue",
   position: "absolute",
   width: "92%",
-};
-
-function StoreString() {
-  this.value = "";
-  this.toCss = () => {
-    const findIllegal = /[=\\"']/gi;
-    const findComma = /[,]/gi;
-    const findUppercase = /[A-Z]/g;
-
-    let filteredString = this.value
-      .replace(findIllegal, "")
-      .replace(findComma, ";")
-      .replace(findUppercase, (char) => `-${char.toLowerCase()}`);
-
-    const openBracketIndex =
-      filteredString.indexOf("{") > 0 ? filteredString.indexOf("{") : false;
-
-    const className = openBracketIndex
-      ? `.${filteredString.split(" ")[1]}`
-      : false;
-    filteredString = `${className ? className : ""} ${filteredString.slice(
-      openBracketIndex
-    )}`;
-    console.log("filteredString " + filteredString);
-    console.log("classname " + className);
-    return filteredString;
-    // return textArray.map((text) => {});
-  };
-  this.updateValue = (input) => {
-    this.value = JSON.stringify(input);
-  };
-}
+};`;
 
 
-const inputString = new StoreString();
+
 function App() {
-  const [userInput, setUserInput] = useState("");
-  const [mode, setMode] = useState("inlineToCss");
+  const [userInput, setUserInput] = useState(defaultInput);
+  const [mode, setMode] = useState("tocss");
+  console.log("mode " + mode);
 
   const inputBoxRef = createRef();
- 
-
-  inputString.updateValue(userInput);
-  inputString.toCss();
 
   const handleUserInput = ({ target }) => {
-    const { value } = target;
-    setUserInput(value);
+    setUserInput(target.value);
   };
 
-
+  const handleSelect = ({ target }) => {
+    setMode(target.value);
+  };
 
   return (
     <div className="App">
-      <input type="text" ref={inputBoxRef} onChange={handleUserInput} />
-  
-      <code>{inputString.toCss()}</code>
+      <div className="">
+        <label htmlFor="convert">convert:</label>
+
+        <select name="convert" id="cars" onChange={handleSelect}>
+          <option value="tocss">React inline to CSS</option>
+          <option value="toinline">CSS to React inline</option>
+        </select>
+      </div>
+      <textarea
+        className="box"
+        type="text"
+        defaultValue={defaultInput}
+        ref={inputBoxRef}
+        onChange={handleUserInput}
+      />
+      <ManipulateString value={userInput} mode={mode} />
     </div>
   );
 }
