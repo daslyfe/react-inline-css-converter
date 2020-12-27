@@ -1,9 +1,15 @@
+import CodeMirror from "@uiw/react-codemirror";
+import "codemirror/keymap/sublime";
+import "../css/codebox.css";
+
 const findComma = /[,]/gi;
 const findUppercase = /[A-Z]/g;
 const findComments = /\/\*[\s\S]*?\*\/|\/\/.*/g;
+const findQuotes = /['"`]/g;
+const findDoubleSpaces = / +(?= )/g;
 
 function ManipulateString({ mode, stringArray }) {
-    //convert jsx style syntax array to css style syntax array
+  //convert jsx style syntax array to css style syntax array
   const toCss = () => {
     let comments = [];
     const filteredArray = stringArray.map((string, index) => {
@@ -16,19 +22,23 @@ function ManipulateString({ mode, stringArray }) {
       const equalIndex = string.indexOf("=");
       const firstSpaceIndex = string.indexOf(" ");
       const isClassLine = openBracketIndex > -1 && equalIndex > -1;
-      
+
       //remove variable declaration and replace with className
       const className = isClassLine
         ? `.${string.slice(firstSpaceIndex + 1, equalIndex)}`
         : false;
 
       string = isClassLine
-        ? `${className} ${string.slice(openBracketIndex)}`
+        ? `${className} ${string.slice(openBracketIndex)}`.replace(
+            findDoubleSpaces,
+            ""
+          )
         : string;
-   
+
       string = string
         .replace(findComma, ";")
-        .replace(findUppercase, (match) => `-${match.toLowerCase()}`);
+        .replace(findUppercase, (match) => `-${match.toLowerCase()}`)
+        .replace(findQuotes, "");
 
       return string;
     });
@@ -40,13 +50,29 @@ function ManipulateString({ mode, stringArray }) {
         : { comment: comment, index: index }
     );
     //add the comments back in with the correct syntax
-    comments.forEach(({comment, index}) => filteredArray[index] = `${filteredArray[index]} ${comment}`)
+    comments.forEach(
+      ({ comment, index }) =>
+        (filteredArray[index] = `${filteredArray[index]} ${comment}`)
+    );
 
-    return filteredArray;
+    //convert array to a single string with linebreak character between each item in array
+    return filteredArray.join("\n");
   };
+
+  const convertedString = mode === "tocss" ? toCss() : "";
+  const codeMirrorMode = mode === "tocss" ? "css" : "jsx";
+
   return (
-    <div contenteditable="true" className="box">
-      {toCss()}
+    <div className="code-box-wrapper">
+      <CodeMirror
+        value={convertedString}
+        options={{
+          theme: "codebox",
+          tabSize: 2,
+          keyMap: "sublime",
+          mode: codeMirrorMode,
+        }}
+      />
     </div>
   );
 }

@@ -4,23 +4,27 @@ import { ar, num } from "./utility/utility";
 import ManipulateString from "./utility/manipulate-strings";
 import CodeMirror from "@uiw/react-codemirror";
 import "codemirror/keymap/sublime";
-import "codemirror/theme/monokai.css";
+import "./css/codebox.css";
+// import "codemirror/theme/shadowfox.css";
 
-const defaultInput = `
-//this is a comment of some kind
-//this is another comment
+const defaultInput = `//you can paste text to convert jsx style objects directly to css classes
+//comments get converted as well
+
 const style = {
-  margin: 0, //test comment
+  margin: 0, 
   padding: 0,
-  background: "none",
-  fontSize: "1vw", //test comment
-  top: ".2vw",
+  fontSize: "1vw", //jsx style rules convert to equivalent css rules
+}
+
+let otherStyle = {
   fontWeight: "bold",
-  left: "0",
-  color: "blue",
-  position: "absolute",
-  width: "92%",
-};`;
+  collor: "blue", //non-matching or misspelled rules are highlighted
+  backgroundColor: "red" 
+}
+
+/* you can also drop in fragments of jsx styles */
+marginBottom: "2em", marginTop: "4em", 
+`;
 
 function App() {
   const [userInput, setUserInput] = useState([]);
@@ -42,6 +46,7 @@ function App() {
     setMode(target.value);
   };
 
+  const codeMirrorMode = mode === "tocss" ? "jsx" : "css";
   return (
     <div className="App">
       <div className="">
@@ -49,26 +54,23 @@ function App() {
 
         <select name="convert" id="cars" onChange={handleSelect}>
           <option value="tocss">React inline to CSS</option>
-          <option value="toinline">CSS to React inline</option>
+          <option value="tojsx">CSS to React inline</option>
         </select>
       </div>
-      {/* <textarea
-        className="box"
-        type="text"
-        defaultValue={defaultInput}
-        ref={inputBoxRef}
-        onChange={handleUserInput}
-      /> */}
-      <CodeMirror
-        value={defaultInput}
-        onChange={handleUserInput}
-        options={{
-          theme: "monokai",
-          tabSize: 2,
-          keyMap: "sublime",
-          mode: "jsx",
-        }}
-      />
+      
+      <div className="code-box-wrapper">
+        <CodeMirror
+          value={defaultInput}
+          onChange={handleUserInput}
+          options={{
+            theme: "codebox",
+            tabSize: 2,
+            keyMap: "sublime",
+            mode: codeMirrorMode,
+          }}
+        />
+      </div>
+      <center><h1 style={{margin: 0}}>&#11015;&#11015;</h1></center>
       <ManipulateString stringArray={userInput} mode={mode} />
     </div>
   );

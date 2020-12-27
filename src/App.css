@@ -1,5 +1,6 @@
+
 .box {
-  width: 40vw; 
+  width: 40vw;
   height: 40vh;
   overflow: auto;
   background: yellowgreen;
@@ -10,3 +11,7 @@ p {
   line-height: 1.4em;
 }
 
+.code-box-wrapper {
+  width: 100vw;
+  height: 40vh;
+}
