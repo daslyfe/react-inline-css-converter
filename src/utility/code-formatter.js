@@ -10,11 +10,9 @@ const findDoubleSpaces = / +(?= )/g;
 const findSemicolon = /[;]/g;
 const findClassName = /\.(.*?)\{/g;
 const findHyphenAndNextLetter = /-[a-z]/g;
-const findBetweenColonAndSemicolon = /(?<=\:)(.*?)(?=\;)/g;
+const findBetweenColonAndSemicolon = /(?<=:)(.*?)(?=;)/g;
 
-
-function ManipulateString({ mode, stringArray }) {
-  
+function CodeFormatter({ mode, stringArray, onChange, className, style }) {
   const reAddComments = (comments, filteredArray) => {
     //convert js style syntax array to css/js style syntax array
     comments = comments.map(({ comment, index }) =>
@@ -33,6 +31,7 @@ function ManipulateString({ mode, stringArray }) {
   };
 
   const toCss = () => {
+    console.log("toCSS triggered")
     let comments = [];
     const filteredArray = stringArray.map((string, index) => {
       //filter out code comments
@@ -64,7 +63,7 @@ function ManipulateString({ mode, stringArray }) {
 
       return string;
     });
-
+    console.log(reAddComments(comments, filteredArray))
     return reAddComments(comments, filteredArray);
   };
   const toJsx = () => {
@@ -81,33 +80,35 @@ function ManipulateString({ mode, stringArray }) {
         .replace(
           findClassName,
           (match) => `const ${match.slice(1, match.length - 1)}= {`
-        ) 
+        )
         .replace(findHyphenAndNextLetter, (match) => match[1].toUpperCase())
         .replace(findBetweenColonAndSemicolon, (match) => ` "${match.trim()}"`)
         .replace(findSemicolon, (match, index) =>
           string[index - 1] !== "}" ? "," : ""
-        );
+        )
+        .replace(findDoubleSpaces, "");
 
       return string;
     });
 
     return reAddComments(comments, filteredArray);
   };
-  const convertedString = mode === "tocss" ? toCss() : toJsx();
-  const codeMirrorMode = mode === "tocss" ? "css" : "jsx";
+  const convertedString = mode === "css" ? toCss() : toJsx();
+  console.log(mode + " " + convertedString)
 
   return (
-    <div className="code-box-wrapper">
+    <div style={style} className={`code-box-wrapper ${className}`}>
       <CodeMirror
+        onChange={onChange ? onChange : (e) => console.log(e)} //prevents error in Codemirror library where if onChange is not defined, it will crash
         value={convertedString}
         options={{
           theme: "codebox",
           tabSize: 2,
           keyMap: "sublime",
-          mode: codeMirrorMode,
+          mode: mode,
         }}
       />
     </div>
   );
 }
-export default ManipulateString;
+export default CodeFormatter;
