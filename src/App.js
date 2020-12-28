@@ -26,9 +26,23 @@ let otherStyle = {
 marginBottom: "2em", marginTop: "4em", 
 `;
 
+const testCssInput= `.style {
+  margin: 0; 
+  padding: 0;
+  font-size: 1vw;  /*jsx style rules convert to equivalent css rules*/
+}
+
+.other-style {
+  font-weight: bold;
+  collor: blue;  /*non-matching or misspelled rules are highlighted*/
+  background-color: red 
+}
+.other-style { font-weight: bold; collor: blue;  /*non-matching or misspelled rules are highlighted*/ background-color: red }
+`
+
 function App() {
   const [userInput, setUserInput] = useState([]);
-  const [mode, setMode] = useState("tocss");
+  const [mode, setMode] = useState("tojsx");
   console.log("mode " + mode);
 
   const inputBoxRef = createRef();
@@ -60,7 +74,7 @@ function App() {
       
       <div className="code-box-wrapper">
         <CodeMirror
-          value={defaultInput}
+          value={testCssInput}
           onChange={handleUserInput}
           options={{
             theme: "codebox",

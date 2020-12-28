@@ -7,9 +7,31 @@ const findUppercase = /[A-Z]/g;
 const findComments = /\/\*[\s\S]*?\*\/|\/\/.*/g;
 const findQuotes = /['"`]/g;
 const findDoubleSpaces = / +(?= )/g;
+const findSemicolon = /[;]/g;
+const findClassName = /\.(.*?)\{/g;
+const findHyphenAndNextLetter = /-[a-z]/g;
+const findBetweenColonAndSemicolon = /(?<=\:)(.*?)(?=\;)/g;
+
 
 function ManipulateString({ mode, stringArray }) {
-  //convert jsx style syntax array to css style syntax array
+  
+  const reAddComments = (comments, filteredArray) => {
+    //convert js style syntax array to css/js style syntax array
+    comments = comments.map(({ comment, index }) =>
+      comment.slice(0, 2) === "//"
+        ? { comment: `/*${comment.slice(2)}*/`, index: index }
+        : { comment: comment, index: index }
+    );
+    //add the comments back in with the correct syntax
+    comments.forEach(
+      ({ comment, index }) =>
+        (filteredArray[index] = `${filteredArray[index]} ${comment}`)
+    );
+
+    //convert array to a single string with linebreak character between each item in array
+    return filteredArray.join("\n");
+  };
+
   const toCss = () => {
     let comments = [];
     const filteredArray = stringArray.map((string, index) => {
@@ -43,23 +65,35 @@ function ManipulateString({ mode, stringArray }) {
       return string;
     });
 
-    //replace invalid comment syntax in comment array with valid css comment syntax
-    comments = comments.map(({ comment, index }) =>
-      comment.slice(0, 2) === "//"
-        ? { comment: `/*${comment.slice(2)}*/`, index: index }
-        : { comment: comment, index: index }
-    );
-    //add the comments back in with the correct syntax
-    comments.forEach(
-      ({ comment, index }) =>
-        (filteredArray[index] = `${filteredArray[index]} ${comment}`)
-    );
-
-    //convert array to a single string with linebreak character between each item in array
-    return filteredArray.join("\n");
+    return reAddComments(comments, filteredArray);
   };
+  const toJsx = () => {
+    let comments = [];
 
-  const convertedString = mode === "tocss" ? toCss() : "";
+    const filteredArray = stringArray.map((string, index) => {
+      //remove comments, and store them with their index to be added back in later
+      string = string.replace(findComments, (match) => {
+        comments.push({ comment: match, index: index });
+        return "";
+      });
+
+      string = string
+        .replace(
+          findClassName,
+          (match) => `const ${match.slice(1, match.length - 1)}= {`
+        ) 
+        .replace(findHyphenAndNextLetter, (match) => match[1].toUpperCase())
+        .replace(findBetweenColonAndSemicolon, (match) => ` "${match.trim()}"`)
+        .replace(findSemicolon, (match, index) =>
+          string[index - 1] !== "}" ? "," : ""
+        );
+
+      return string;
+    });
+
+    return reAddComments(comments, filteredArray);
+  };
+  const convertedString = mode === "tocss" ? toCss() : toJsx();
   const codeMirrorMode = mode === "tocss" ? "css" : "jsx";
 
   return (
