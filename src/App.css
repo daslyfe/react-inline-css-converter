@@ -35,26 +35,28 @@ h1 {
 .flex {
   display: flex;
 }
-
+.flex-item {
+  flex-grow: 1;
+}
 .app {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background: blue;
   height: 100vh;
   width: 100vw;
   flex-flow: column nowrap;
+  align-items: stretch;
 }
 .code-box-wrapper {
   width: 100%;
-  height: 47vh;
-  background: green;
 }
-
 
 .sideways-text-box {
   width: auto;
-  height: full;
   writing-mode: vertical-rl;
   text-orientation: mixed;
+}
+.bottom-text {
+  padding-top: 2.25em;
+  padding-bottom: 2.25em;
 }

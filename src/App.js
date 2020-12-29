@@ -1,18 +1,18 @@
+/* Jade@JadeRose.red 2020 daslyfe.github.io */
 import "./App.css";
 import { useState } from "react";
-
 import CodeFormatter from "./utility/code-formatter";
 
 const defaultInput = [
-  `//convert jsx inline -> CSS *or* CSS -> inline in realtime by typing or pasting text`,
-  `const myStyle = { backgroundColor: "blue" }`,
+  `//convert jsx inline -> CSS *or* CSS -> inline in realtime @Jade Rose`,
+  `const myStyle = { writingMode: "vertical-rl", }`,
 ];
 
 function App() {
   const [fromCss, setFromCss] = useState(defaultInput);
   const [fromJsx, setFromJsx] = useState(defaultInput);
 
-  console.log(fromJsx);
+  console.log(fromCss);
   const handleUserInput = (e) => {
     const { doc } = e;
     const { modeOption } = doc;
@@ -34,7 +34,7 @@ function App() {
 
   return (
     <div className="app">
-      <div className="flex">
+      <div className="flex flex-item">
         <CodeFormatter
           key={"jsx"}
           onChange={handleUserInput}
@@ -48,7 +48,7 @@ function App() {
       <h1 className="text-accent1">
         &#11015; <span className="text-accent2">&#11014;</span>
       </h1>
-      <div className="flex">
+      <div className="flex flex-item">
         <CodeFormatter
           key={"css"}
           onChange={handleUserInput}
@@ -56,7 +56,7 @@ function App() {
           mode={"css"}
         />
         <div className="bg-accent2 sideways-text-box">
-          <h1 className="text-dark">CSS</h1>
+          <h1 className="text-dark bottom-text">CSS</h1>
         </div>
       </div>
     </div>

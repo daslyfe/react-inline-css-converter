@@ -3,14 +3,18 @@ import "codemirror/keymap/sublime";
 import "../css/codebox.css";
 
 const findComma = /[,]/gi;
+const findEqualSign = /[=]/g;
 const findUppercase = /[A-Z]/g;
 const findComments = /\/\*[\s\S]*?\*\/|\/\/.*/g;
 const findQuotes = /['"`]/g;
 const findDoubleSpaces = / +(?= )/g;
 const findSemicolon = /[;]/g;
 const findClassName = /\.(.*?)\{/g;
-const findHyphenAndNextLetter = /-[a-z]/g;
+const findHyphenAndNextLetter = /(?![^:]*\")+-[a-zA-z]/g; //ignore rule values
 const findBetweenColonAndSemicolon = /(?<=:)(.*?)(?=;)/g;
+// const findNotBetweenBrackets = /[^}]+(?![^{]*\})/g;
+// const findNotRuleValue = /[^;]+(?![^:]*\;)/g;
+const findVariable = /(const|let|var)(.*?)(?==)/g;
 
 function CodeFormatter({
   mode,
@@ -45,25 +49,20 @@ function CodeFormatter({
         comments.push({ comment: match.trim(), index: index });
         return "";
       });
-      const openBracketIndex = string.indexOf("{");
-      const equalIndex = string.indexOf("=");
-      const firstSpaceIndex = string.indexOf(" ");
-      const isClassLine = openBracketIndex > -1 && equalIndex > -1;
-
-      //remove variable declaration and replace with className
-      const className = isClassLine
-        ? `.${string.slice(firstSpaceIndex + 1, equalIndex)}`
-        : false;
-
-      string = isClassLine
-        ? `${className} ${string.slice(openBracketIndex)}`.replace(
-            findDoubleSpaces,
-            ""
-          )
-        : string;
 
       string = string
+        //get the JS variable name and convert into CSS class Name
+        .replace(findVariable, (match) => {
+          const beforeEqualsAndOutsideBrackets = match.trim().split(" ");
+          return `.${
+            beforeEqualsAndOutsideBrackets[
+              beforeEqualsAndOutsideBrackets.length - 1
+            ]
+          }`;
+        })
+        .replace(findEqualSign, "")
         .replace(findComma, ";")
+        //turn JSX camelcase rules into css rules
         .replace(findUppercase, (match) => `-${match.toLowerCase()}`)
         .replace(findQuotes, "");
 
@@ -73,25 +72,29 @@ function CodeFormatter({
     return reAddComments(comments, filteredArray);
   };
   const toJsx = () => {
-    let comments = [];
-
+    //removed comments are stored in this array
+    let comments = []; 
+    //remove comments, and store them with their index to be added back in later
     const filteredArray = stringArray.map((string, index) => {
-      //remove comments, and store them with their index to be added back in later
       string = string.replace(findComments, (match) => {
         comments.push({ comment: match.trim(), index: index });
         return "";
       });
 
       string = string
+      //turn class name into JS variable name
         .replace(
           findClassName,
           (match) => `const ${match.slice(1, match.length - 1)}= {`
-        )
-        .replace(findHyphenAndNextLetter, (match) => match[1].toUpperCase())
-        .replace(findBetweenColonAndSemicolon, (match) => ` "${match.trim()}"`)
+        ) 
+        //put rule value in quotes
+        .replace(findBetweenColonAndSemicolon, (match) => ` "${match.trim()}"`) 
+        //turn hyphens into camelcase
+        .replace(findHyphenAndNextLetter, (match) => match[1].toUpperCase()) 
+        //turn semicolons into hyphens, except at the end of a closing bracket
         .replace(findSemicolon, (match, index) =>
           string[index - 1] !== "}" ? "," : ""
-        )
+        ) 
         .replace(findDoubleSpaces, "");
 
       return string;
@@ -99,18 +102,20 @@ function CodeFormatter({
 
     return reAddComments(comments, filteredArray);
   };
+  
   const convertedString = mode === "css" ? toCss() : toJsx();
 
   return (
     <div style={style} className={`code-box-wrapper ${className}`}>
       <CodeMirror
-        onChange={onChange ? onChange : (e) => console.log(e)} //prevents error in Codemirror library where if onChange is not defined, it will crash
+        onChange={onChange ? onChange : (e) => console.log(e)} //extraneous function prevents error in Codemirror library where if onChange is not defined, it will crash
         value={convertedString}
         options={{
           theme: "codebox",
           tabSize: 2,
           keyMap: "sublime",
           mode: mode,
+          lineWrapping: true,
         }}
       />
     </div>
