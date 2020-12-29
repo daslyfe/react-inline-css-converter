@@ -12,7 +12,7 @@ I made this because sometimes I test using inline styles and want to convert the
 
 # Example :
 const myStyle = { writingMode: "vertical-rl", } <-TO JSX TO CSS-> .my-style { writing-mode: vertical-rl; }
-[https://www.jaderose.red/](A live version of this app is available here)
+[DEMO: A live version of this app is available here](https://www.jaderose.red/projects/react-inline-css-converter)
 
 ## Available Scripts
 
