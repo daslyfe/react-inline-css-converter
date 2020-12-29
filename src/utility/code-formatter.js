@@ -88,7 +88,7 @@ function CodeFormatter({
           (match) => `const ${match.slice(1, match.length - 1)}= {`
         ) 
         //put rule value in quotes
-        .replace(findBetweenColonAndSemicolon, (match) => ` "${match.trim()}"`) 
+        .replace(findBetweenColonAndSemicolon, (match) => `: "${match.slice(1).trim()}"`) 
         //turn hyphens into camelcase
         .replace(findHyphenAndNextLetter, (match) => match[1].toUpperCase()) 
         //turn semicolons into hyphens, except at the end of a closing bracket
