@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "React Inline CSS Comnverter",
+  "name": "React Inline CSS Comnverter",
   "icons": [
     {
       "src": "favicon.ico",

@@ -1,5 +1,5 @@
-/* Jade@JadeRose.red 2020 daslyfe.github.io */
-import "./App.css";
+/* Jade@JadeRose.red daslyfe.github.com */
+import "./css/App.css";
 import { useState } from "react";
 import CodeFormatter from "./utility/code-formatter";
 
@@ -12,7 +12,6 @@ function App() {
   const [fromCss, setFromCss] = useState(defaultInput);
   const [fromJsx, setFromJsx] = useState(defaultInput);
 
-  console.log(fromCss);
   const handleUserInput = (e) => {
     const { doc } = e;
     const { modeOption } = doc;

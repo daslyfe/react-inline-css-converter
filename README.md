@@ -1,6 +1,18 @@
-# Getting Started with Create React App
+## React Inline CSS converter
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is a realtime converter that you can use to change CSS into JSX style syntax or vice versa.
+
+I made this because sometimes I test using inline styles and want to convert them into CSS syntax or vice versa, and manually changing the syntax feels like a waste of time.
+
+# Features: 
+- syntax highlighting
+- comment conversion //comment -> /*comment*/
+- rule conversion and syntax conversion 
+- realtime conversion
+
+# Example :
+const myStyle = { writingMode: "vertical-rl", } <-TO JSX TO CSS-> .my-style { writing-mode: vertical-rl; }
+[https://www.jaderose.red/](A live version of this app is available here)
 
 ## Available Scripts
 
