@@ -11,7 +11,7 @@ const findDoubleSpaces = / +(?= )/g;
 const findSemicolon = /[;]/g;
 const findClassName = /\.(.*?)\{/g;
 const findHyphenAndNextLetter = /(?![^:]*\")+-[a-zA-z]/g; //ignore rule values
-const findBetweenColonAndSemicolon = /(?<=:)(.*?)(?=;)/g;
+const findBetweenColonAndSemicolon = /(:)(.*?)(?=;)/g;
 // const findNotBetweenBrackets = /[^}]+(?![^{]*\})/g;
 // const findNotRuleValue = /[^;]+(?![^:]*\;)/g;
 const findVariable = /(const|let|var)(.*?)(?==)/g;
