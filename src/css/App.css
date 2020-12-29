@@ -37,6 +37,7 @@ h1 {
 }
 .flex-item {
   flex-grow: 1;
+  max-height: 47%
 }
 .app {
   display: flex;
