@@ -1,95 +1,64 @@
 import "./App.css";
-import { createRef, useState } from "react";
-import { ar, num } from "./utility/utility";
+import { useState } from "react";
+
 import CodeFormatter from "./utility/code-formatter";
-import CodeMirror from "@uiw/react-codemirror";
-import "codemirror/keymap/sublime";
-import "./css/codebox.css";
-// import "codemirror/theme/shadowfox.css";
 
-const defaultInput = `//you can paste text to convert jsx style objects directly to css classes
-//comments get converted as well
-
-const style = {
-  margin: 0, 
-  padding: 0,
-  fontSize: "1vw", //jsx style rules convert to equivalent css rules
-}
-
-let otherStyle = {
-  fontWeight: "bold",
-  collor: "blue", //non-matching or misspelled rules are highlighted
-  backgroundColor: "red" 
-}
-
-/* you can also drop in fragments of jsx styles */
-marginBottom: "2em", marginTop: "4em", 
-`;
-
-const testCssInput = `.style {
-  margin: 0; 
-  padding: 0;
-  font-size: 1vw;  /*jsx style rules convert to equivalent css rules*/
-}
-
-.other-style {
-  font-weight: bold;
-  collor: blue;  /*non-matching or misspelled rules are highlighted*/
-  background-color: red 
-}
-.other-style { font-weight: bold; collor: blue;  /*non-matching or misspelled rules are highlighted*/ background-color: red }
-`;
+const defaultInput = [
+  `//convert jsx inline -> CSS *or* CSS -> inline in realtime by typing or pasting text`,
+  `const myStyle = { backgroundColor: "blue" }`,
+];
 
 function App() {
-  // const [userInput, setUserInput] = useState([]);
-  const [fromCss, setFromCss] = useState([]);
-  const [fromJsx, setFromJsx] = useState([]);
+  const [fromCss, setFromCss] = useState(defaultInput);
+  const [fromJsx, setFromJsx] = useState(defaultInput);
 
-
-
-  const handleUserInput = ({ doc }) => {
+  console.log(fromJsx);
+  const handleUserInput = (e) => {
+    const { doc } = e;
     const { modeOption } = doc;
-    console.log("modeOption " + modeOption)
+    const { focused } = e.state;
     const { children } = doc;
+
+    //get the line text from each array and flatten to single array
     const lines = children
       .map(({ lines }) => lines.map(({ text }) => text))
       .flat(1);
-    modeOption === "text/jsx" ? setFromJsx(lines) : setFromCss(lines);
-    console.log(lines);
+
+    //update the respective states, prevent rerender in the box you are typing in
+    if (modeOption === "text/jsx" && focused) {
+      setFromJsx(lines);
+    } else if (modeOption === "text/css" && focused) {
+      setFromCss(lines);
+    }
   };
 
-  // const handleSelect = ({ target }) => {
-  //   setMode(target.value);
-  // };
-
   return (
-    <div className="App">
-      <div className="">
-        {/* <label htmlFor="convert">convert:</label>
-
-        <select name="convert" id="cars" onChange={handleSelect}>
-          <option value="tocss">React inline to CSS</option>
-          <option value="tojsx">CSS to React inline</option>
-        </select> */}
-      </div>
-
-      {/* <div className="code-box-wrapper">
-        <CodeMirror
-          value={defaultInput}
+    <div className="app">
+      <div className="flex">
+        <CodeFormatter
+          key={"jsx"}
           onChange={handleUserInput}
-          options={{
-            theme: "codebox",
-            tabSize: 2,
-            keyMap: "sublime",
-            mode: "jsx",
-          }}
+          stringArray={fromCss}
+          mode={"jsx"}
         />
-      </div> */}
-      <center>
-        <h1 style={{ margin: 0 }}>&#11015;&#11015;</h1>
-      </center>
-      <CodeFormatter key={"jsx"} onChange={handleUserInput} stringArray={fromCss} mode={"jsx"} />
-      <CodeFormatter key={"css"} onChange={handleUserInput} stringArray={fromJsx} mode={"css"} />
+        <div className="bg-accent1 sideways-text-box">
+          <h1 className="text-dark">REACT STYLE</h1>
+        </div>
+      </div>
+      <h1 className="text-accent1">
+        &#11015; <span className="text-accent2">&#11014;</span>
+      </h1>
+      <div className="flex">
+        <CodeFormatter
+          key={"css"}
+          onChange={handleUserInput}
+          stringArray={fromJsx}
+          mode={"css"}
+        />
+        <div className="bg-accent2 sideways-text-box">
+          <h1 className="text-dark">CSS</h1>
+        </div>
+      </div>
     </div>
   );
 }

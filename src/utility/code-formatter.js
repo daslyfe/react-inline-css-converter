@@ -12,7 +12,14 @@ const findClassName = /\.(.*?)\{/g;
 const findHyphenAndNextLetter = /-[a-z]/g;
 const findBetweenColonAndSemicolon = /(?<=:)(.*?)(?=;)/g;
 
-function CodeFormatter({ mode, stringArray, onChange, className, style }) {
+function CodeFormatter({
+  mode,
+  stringArray,
+  onChange,
+  className,
+  style,
+  onFocus,
+}) {
   const reAddComments = (comments, filteredArray) => {
     //convert js style syntax array to css/js style syntax array
     comments = comments.map(({ comment, index }) =>
@@ -23,7 +30,7 @@ function CodeFormatter({ mode, stringArray, onChange, className, style }) {
     //add the comments back in with the correct syntax
     comments.forEach(
       ({ comment, index }) =>
-        (filteredArray[index] = `${filteredArray[index]} ${comment}`)
+        (filteredArray[index] = `${filteredArray[index]}${comment}`)
     );
 
     //convert array to a single string with linebreak character between each item in array
@@ -31,12 +38,11 @@ function CodeFormatter({ mode, stringArray, onChange, className, style }) {
   };
 
   const toCss = () => {
-    console.log("toCSS triggered")
     let comments = [];
     const filteredArray = stringArray.map((string, index) => {
       //filter out code comments
       string = string.replace(findComments, (match) => {
-        comments.push({ comment: match, index: index });
+        comments.push({ comment: match.trim(), index: index });
         return "";
       });
       const openBracketIndex = string.indexOf("{");
@@ -63,7 +69,7 @@ function CodeFormatter({ mode, stringArray, onChange, className, style }) {
 
       return string;
     });
-    console.log(reAddComments(comments, filteredArray))
+
     return reAddComments(comments, filteredArray);
   };
   const toJsx = () => {
@@ -72,7 +78,7 @@ function CodeFormatter({ mode, stringArray, onChange, className, style }) {
     const filteredArray = stringArray.map((string, index) => {
       //remove comments, and store them with their index to be added back in later
       string = string.replace(findComments, (match) => {
-        comments.push({ comment: match, index: index });
+        comments.push({ comment: match.trim(), index: index });
         return "";
       });
 
@@ -94,7 +100,6 @@ function CodeFormatter({ mode, stringArray, onChange, className, style }) {
     return reAddComments(comments, filteredArray);
   };
   const convertedString = mode === "css" ? toCss() : toJsx();
-  console.log(mode + " " + convertedString)
 
   return (
     <div style={style} className={`code-box-wrapper ${className}`}>
