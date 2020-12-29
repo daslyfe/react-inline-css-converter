@@ -55,6 +55,8 @@ h1 {
   width: auto;
   writing-mode: vertical-rl;
   text-orientation: mixed;
+
+  border-radius: 5px;
 }
 .bottom-text {
   padding-top: 2.25em;
